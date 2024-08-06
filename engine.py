@@ -38,7 +38,7 @@ def train_one_epoch(train_loader,
         out = model(images)
         loss_dice = dice_loss(out, targets, softmax=False)
         loss_ce = ce_loss(out, targets[:].long())
-        loss = loss_dice + loss_ce
+        loss = 0.5 * loss_dice + 0.5 * loss_ce
 
         loss.backward()
         optimizer.step()
@@ -52,7 +52,6 @@ def train_one_epoch(train_loader,
         if iter % config.print_interval == 0:
             log_info = f'train: epoch {epoch}, iter:{iter}, loss: {np.mean(loss_list):.4f}, lr: {now_lr}'
             print(log_info)
-            #logger.info(log_info)
     scheduler.step() 
     return step
 
@@ -82,7 +81,7 @@ def val_one_epoch(test_loader,
             out = model(img)
             loss_dice = dice_loss(out, msk, softmax=False)
             loss_ce = ce_loss(out, msk[:].long())
-            loss = loss_dice + loss_ce
+            loss = 0.5 * loss_dice + 0.5 * loss_ce
 
             loss_list.append(loss.item())
             gts.append(msk.squeeze(0).cpu().detach().numpy())
@@ -104,12 +103,10 @@ def val_one_epoch(test_loader,
             dice_list.append(dice)
             hd95_list.append(hd95)
             f1_list.append(f1)
-        log_info = (f'test of best model, loss: {np.mean(loss_list):.4f}, ObjectDice: {np.mean(dice_list)}'
+        log_info = (f'val of best model, loss: {np.mean(loss_list):.4f}, ObjectDice: {np.mean(dice_list)}'
                         f', ObjectHausdorff:{np.mean(hd95)},'
                         f' f1: {np.mean(f1_list)}')
         print(log_info)
-        logger.info(log_info)
-
     else:
         log_info = f'val epoch: {epoch}, loss: {np.mean(loss_list):.4f}'
         print(log_info)
@@ -138,20 +135,20 @@ def test_one_epoch(test_loader,
         for i, data in enumerate(tqdm(test_loader)):
             img = data['image']
             msk = data['mask']
+            case = data['case_name'][0]
             img, msk = img.cuda(non_blocking=True).float(), msk.cuda(non_blocking=True).float()
 
             out = model(img)
             loss_dice = dice_loss(out, msk, softmax=False)
             loss_ce = ce_loss(out, msk[:].long())
-            loss = loss_dice + loss_ce
+            loss = 0.5 * loss_dice + 0.5 * loss_ce
 
             loss_list.append(loss.item())
             gts.append(msk.squeeze(0).cpu().detach().numpy())
             out = torch.argmax(torch.softmax(out, dim=1), dim=1).squeeze(0)
             out = out.squeeze(1).cpu().detach().numpy()
-            preds.append(out) 
-            # if i % config.save_interval == 0:
-            #     save_imgs(img, msk, out, i, config.work_dir + 'outputs/', config.datasets, config.threshold, test_data_name=test_data_name)
+            cv2.imwrite(config.work_dir + 'outputs/' + case + '.bmp', out * 255)
+            preds.append(out)
 
         preds = np.array(preds)
         gts = np.array(gts)
@@ -167,12 +164,11 @@ def test_one_epoch(test_loader,
         log_info = (f'test of best model, loss: {np.mean(loss_list):.4f}, ObjectDice: {np.mean(dice_list)}'
                     f', ObjectHausdorff:{np.mean(hd95)},'
                     f' f1: {np.mean(f1_list)}')
+
         print(log_info)
-        #logger.info(log_info)
 
         if test_data_name is not None:
             log_info = f'test_datasets_name: {test_data_name}'
             print(log_info)
-            #logger.info(log_info)
 
     return np.mean(loss_list)
