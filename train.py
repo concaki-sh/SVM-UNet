@@ -177,7 +177,7 @@ def main(config):
             )
         os.rename(
             os.path.join(checkpoint_dir, 'best.pth'),
-            os.path.join(checkpoint_dir, f'best-epoch{min_epoch}-loss{min_loss:.4f}.pth')
+            os.path.join(checkpoint_dir, f'best-epoch{min_epoch}-dice{max_dice:.4f}.pth')
         )      
 
 
