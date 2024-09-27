@@ -98,6 +98,7 @@ def main(config):
     min_loss = 999
     start_epoch = 1
     min_epoch = 1
+    max_dice = 0
 
 
 
@@ -138,7 +139,7 @@ def main(config):
             writer
         )
 
-        loss = val_one_epoch(
+        loss, dice = val_one_epoch(
                 val_loader,
                 model,
                 criterion,
@@ -147,9 +148,9 @@ def main(config):
                 config
             )
 
-        if loss < min_loss:
+        if dice > max_dice:
             torch.save(model.state_dict(), os.path.join(checkpoint_dir, 'best.pth'))
-            min_loss = loss
+            max_dice = dice
             min_epoch = epoch
 
         torch.save(

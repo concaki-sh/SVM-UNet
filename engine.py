@@ -89,7 +89,11 @@ def val_one_epoch(test_loader,
                 out = out[0]
             out = torch.argmax(torch.softmax(out, dim=1), dim=1).squeeze(0)
             out = out.squeeze(1).cpu().detach().numpy()
-            preds.append(out) 
+            preds.append(out)
+            gt = msk.squeeze(0).cpu().detach().numpy()
+            pre = out
+            dice = ObjectDice(pre, gt)
+            dice_list.append(dice)
 
     if epoch % config.val_interval == 0:
         preds = np.array(preds)
@@ -97,10 +101,8 @@ def val_one_epoch(test_loader,
         for i in range(len(preds)):
             pred = preds[i]
             gt = gts[i]
-            dice = ObjectDice(pred, gt)
             hd95 = ObjectHausdorff(pred, gt)
             f1 = F1score(pred, gt)
-            dice_list.append(dice)
             hd95_list.append(hd95)
             f1_list.append(f1)
         log_info = (f'val of best model, loss: {np.mean(loss_list):.4f}, ObjectDice: {np.mean(dice_list)}'
@@ -108,11 +110,9 @@ def val_one_epoch(test_loader,
                         f' f1: {np.mean(f1_list)}')
         print(log_info)
     else:
-        log_info = f'val epoch: {epoch}, loss: {np.mean(loss_list):.4f}'
+        log_info = f'val epoch: {epoch}, loss: {np.mean(loss_list):.4f}, dice: {np.mean(dice_list):.4f}'
         print(log_info)
-        #logger.info(log_info)
-    
-    return np.mean(loss_list)
+    return np.mean(loss_list), np.mean(dice_list)
 
 
 def test_one_epoch(test_loader,
