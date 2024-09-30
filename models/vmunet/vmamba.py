@@ -247,6 +247,47 @@ class Final_PatchExpand2D(nn.Module):
         return x
 
 
+class SEBlock(nn.Module):
+    def __init__(self, channels, reduction=16):
+        super(SEBlock, self).__init__()
+        self.fc1 = nn.Conv2d(channels, channels // reduction, kernel_size=1)
+        self.fc2 = nn.Conv2d(channels // reduction, channels, kernel_size=1)
+
+    def forward(self, x):
+        w = F.adaptive_avg_pool2d(x, (1, 1))  # 全局平均池化
+        w = F.relu(self.fc1(w))
+        w = torch.sigmoid(self.fc2(w))
+        return x * w  # 通过加权重新分配通道的重要性
+
+
+class Detailblock(nn.Module):
+    def __init__(self, inc, mlt=2):
+        super().__init__()
+        self.inc = inc
+        self.mlt = mlt
+        self.conv1 = nn.Conv2d(self.inc, self.inc * self.mlt, 3, 1, 1, dilation=1)
+        self.conv2 = nn.Conv2d(self.inc * self.mlt, self.inc * self.mlt, 3, 1, 2, dilation=2)
+        self.conv3 = nn.Conv2d(self.inc * self.mlt, self.inc, 3, 1, 4, dilation=4)
+        self.res = nn.Conv2d(self.inc, self.inc, 1, 1)
+        self.bn = nn.GroupNorm(num_groups=32, num_channels=self.inc)
+        self.act = nn.SiLU()
+        self.conv = nn.Conv2d(self.inc * 6, self.inc, 1, 1)
+
+    def forward(self, x: torch.Tensor):
+        x = x.permute(0, 3, 1, 2).contiguous()
+        x_ori = self.act(self.bn(x))
+        re = self.res(x_ori)
+        x1 = self.conv1(x_ori)
+        x2 = self.conv2(x1)
+        x3 = self.conv3(x2)
+        x = torch.cat([x_ori, x1, x2, x3], dim=1)
+        x = self.conv(x)
+        out = x + re
+        out = self.bn(out)
+        out = self.act(out)
+        return out.permute(0, 2, 3, 1).contiguous()
+
+
 class SS2D(nn.Module):
     def __init__(
         self,
@@ -684,7 +725,7 @@ class VSSM(nn.Module):
                 use_checkpoint=use_checkpoint,
             )
             self.layers_up.append(layer)
-
+        self.detail = Detailblock(inc=dims[-1], mlt=2)
         self.final_up = Final_PatchExpand2D(dim=dims_decoder[-1], dim_scale=4, norm_layer=norm_layer)
         self.final_conv = nn.Conv2d(dims_decoder[-1]//4, num_classes, 1)
 
@@ -758,6 +799,7 @@ class VSSM(nn.Module):
 
     def forward(self, x):
         x, skip_list = self.forward_features(x)
+        x = self.detail(x)
         x = self.forward_features_up(x, skip_list)
         x = self.forward_final(x)
         

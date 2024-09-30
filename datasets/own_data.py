@@ -15,8 +15,6 @@ from albumentations.pytorch import ToTensorV2
 import cv2
 
 
-
-
 def read_own_data(root_path, split='train'):
     images = []
     masks = []
@@ -61,9 +59,7 @@ class ImageFolder(data.Dataset):
             A.RandomRotate90(p=0.5),  # 随机90度旋转
             A.ElasticTransform(p=0.5),  # 弹性变换
             A.RandomBrightnessContrast(p=0.5),  # 随机亮度对比度
-            A.CLAHE(p=0.5),  # 自适应直方图均衡化
             A.GaussNoise(p=0.5),  # 高斯噪声
-            A.RandomCrop(height=self.args.img_size, width=self.args.img_size, p=0.5),
             A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),  # 归一化
             ToTensorV2()  # 转张量
         ])
