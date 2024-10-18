@@ -250,14 +250,24 @@ class Final_PatchExpand2D(nn.Module):
 class SEBlock(nn.Module):
     def __init__(self, channels, reduction=16):
         super(SEBlock, self).__init__()
-        self.fc1 = nn.Conv2d(channels, channels // reduction, kernel_size=1)
-        self.fc2 = nn.Conv2d(channels // reduction, channels, kernel_size=1)
+        self.fc1 = nn.Linear(channels, channels // reduction, bias=False)
+        self.fc2 = nn.Linear(channels // reduction, channels, bias=False)
+        self.conv = nn.Conv2d(2, 1, 7, padding=3, bias=False)
 
     def forward(self, x):
-        w = F.adaptive_avg_pool2d(x, (1, 1))  # 全局平均池化
-        w = F.relu(self.fc1(w))
-        w = torch.sigmoid(self.fc2(w))
-        return x * w  # 通过加权重新分配通道的重要性
+        B, C, H, W = x.size()
+        squeeze = F.adaptive_avg_pool2d(x, 1).view(B, C)
+        excitation = F.relu(self.fc1(squeeze))
+        excitation = torch.sigmoid(self.fc2(excitation))
+        excitation = excitation.view(B, C, 1, 1)
+        out = x * excitation
+
+        avg_out = torch.mean(out, dim=1, keepdim=True)
+        max_out, _ = torch.max(out, dim=1, keepdim=True)
+        cat_out = torch.cat([avg_out, max_out], dim=1)
+        attn_w = torch.sigmoid(self.conv(cat_out))
+        out = out * attn_w
+        return out
 
 
 class Detailblock(nn.Module):
@@ -330,7 +340,7 @@ class SS2D(nn.Module):
             **factory_kwargs,
         )
         self.act = nn.SiLU()
-
+        self.sp = SEBlock(channels=self.d_inner)
         self.x_proj = (
             nn.Linear(self.d_inner, (self.dt_rank + self.d_state * 2), bias=False, **factory_kwargs), 
             nn.Linear(self.d_inner, (self.dt_rank + self.d_state * 2), bias=False, **factory_kwargs), 
