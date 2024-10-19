@@ -512,10 +512,12 @@ class SS2D(nn.Module):
 
         x = x.permute(0, 3, 1, 2).contiguous()
         x = self.act(self.conv2d(x)) # (b, d, h, w)
+        y_se = self.sp(x).contiguous().view(B, H, W, -1)
         y1, y2, y3, y4 = self.forward_core(x)
         assert y1.dtype == torch.float32
         y = y1 + y2 + y3 + y4
         y = torch.transpose(y, dim0=1, dim1=2).contiguous().view(B, H, W, -1)
+        y = y + y_se
         y = self.out_norm(y)
         y = y * F.silu(z)
         out = self.out_proj(y)
