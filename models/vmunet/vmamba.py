@@ -248,25 +248,16 @@ class Final_PatchExpand2D(nn.Module):
 
 
 class SEBlock(nn.Module):
-    def __init__(self, channels, reduction=16):
+    def __init__(self, k=7):
         super(SEBlock, self).__init__()
-        self.fc1 = nn.Linear(channels, channels // reduction, bias=False)
-        self.fc2 = nn.Linear(channels // reduction, channels, bias=False)
-        self.conv = nn.Conv2d(2, 1, 7, padding=3, bias=False)
+        self.conv = nn.Conv2d(2, 1, kernel_size=k, padding=(k-1)//2, bias=False)
 
     def forward(self, x):
-        B, C, H, W = x.size()
-        squeeze = F.adaptive_avg_pool2d(x, 1).view(B, C)
-        excitation = F.relu(self.fc1(squeeze))
-        excitation = torch.sigmoid(self.fc2(excitation))
-        excitation = excitation.view(B, C, 1, 1)
-        out = x * excitation
-
-        avg_out = torch.mean(out, dim=1, keepdim=True)
-        max_out, _ = torch.max(out, dim=1, keepdim=True)
+        avg_out = torch.mean(x, dim=1, keepdim=True)
+        max_out, _ = torch.max(x, dim=1, keepdim=True)
         cat_out = torch.cat([avg_out, max_out], dim=1)
         attn_w = torch.sigmoid(self.conv(cat_out))
-        out = out * attn_w
+        out = x * attn_w
         return out
 
 
@@ -340,7 +331,7 @@ class SS2D(nn.Module):
             **factory_kwargs,
         )
         self.act = nn.SiLU()
-        self.sp = SEBlock(channels=self.d_inner)
+        self.sp = SEBlock(k=7)
         self.x_proj = (
             nn.Linear(self.d_inner, (self.dt_rank + self.d_state * 2), bias=False, **factory_kwargs), 
             nn.Linear(self.d_inner, (self.dt_rank + self.d_state * 2), bias=False, **factory_kwargs), 
@@ -739,7 +730,7 @@ class VSSM(nn.Module):
             self.layers_up.append(layer)
         self.detail = Detailblock(inc=dims[-1], mlt=2)
         self.final_up = Final_PatchExpand2D(dim=dims_decoder[-1], dim_scale=4, norm_layer=norm_layer)
-        self.final_conv = nn.Conv2d(dims_decoder[-1]//4, num_classes, 1)
+        self.final_conv = nn.Conv2d(dims_decoder[-1]//4, num_classes, 3, 1, 1)
 
         # self.norm = norm_layer(self.num_features)
         # self.avgpool = nn.AdaptiveAvgPool1d(1)
