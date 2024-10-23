@@ -7,6 +7,7 @@ from sklearn.metrics import confusion_matrix
 from utils import DiceLoss
 import torch.nn as nn
 from utils_ import *
+from post import postprocess
 
 
 def train_one_epoch(train_loader,
@@ -147,6 +148,7 @@ def test_one_epoch(test_loader,
             gts.append(msk.squeeze(0).cpu().detach().numpy())
             out = torch.argmax(torch.softmax(out, dim=1), dim=1).squeeze(0)
             out = out.squeeze(1).cpu().detach().numpy()
+            out = postprocess(out, filter_size=7, min_area=400)
             cv2.imwrite(config.work_dir + 'outputs/' + case + '.bmp', out * 255)
             preds.append(out)
 
