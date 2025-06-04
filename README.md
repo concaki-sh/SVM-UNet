@@ -40,7 +40,7 @@ pip install -r requirements.txt
 
 ### CRAG datasets
 
-- For the CRAG dataset, you could follow [MILD-Net: Minimal Information Loss Dilated Network for Gland Instance Segmentation in Colon Histology Images∗]([https://github.com/HuCatoFighting/Swin-Une](https://github.com/XiaoyuZHK/CRAG-Dataset_Aug_ToCOCO)) to download the dataset, or you could download them from {[Baidu](https://pan.baidu.com/s/1JCXBfRL9y1cjfJUKtbEhiQ?pwd=9jti)}.
+- For the CRAG dataset, you could follow [MILD-Net: Minimal Information Loss Dilated Network for Gland Instance Segmentation in Colon Histology Images∗]([https://github.com/HuCatoFighting/Swin-Une](https://github.com/XiaoyuZHK/CRAG-Dataset_Aug_ToCOCO)) to download the dataset, or you could download them from {[google drive](https://drive.google.com/drive/folders/1OJPpVBX6PKNyy2j34QK_gZN19gDamYd3?usp=sharing)}.
 
 - After downloading the datasets, you are supposed to put them into './data/crag/', and the file format reference is as follows.
 
