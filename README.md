@@ -18,7 +18,7 @@ pip install -r requirements.txt
 ## 1. Prepare the dataset
 
 ### Glas datasets
-- The GLAS dataset from MICCAI 2015 Gland Segmentation Challenge, all the data(include CRAG) can be downloaded from {[google drive](https://drive.google.com/drive/folders/1OJPpVBX6PKNyy2j34QK_gZN19gDamYd3?usp=sharing)}.
+- The GLAS dataset from MICCAI 2015 Gland Segmentation Challenge, all the data(include CRAG) can be downloaded from {[google drive](https://drive.google.com/drive/folders/1Q_6MD3tWxjxfAcZ-6qYgvCALnhFpUKIs?usp=sharing)}.
 - After downloading the dataset, please place the files into the ./data/Gland/ directory. The expected directory structure and file naming format are shown below (using the GLAS dataset as an example).
 
 - './data/Gland/'
@@ -40,7 +40,7 @@ pip install -r requirements.txt
 
 ### CRAG datasets
 
-- For the CRAG dataset, you could follow [MILD-Net: Minimal Information Loss Dilated Network for Gland Instance Segmentation in Colon Histology Images∗]([https://github.com/HuCatoFighting/Swin-Une](https://github.com/XiaoyuZHK/CRAG-Dataset_Aug_ToCOCO)) to download the dataset, or you could download them from {[google drive](https://drive.google.com/drive/folders/1OJPpVBX6PKNyy2j34QK_gZN19gDamYd3?usp=sharing)}.
+- For the CRAG dataset, you could follow [MILD-Net: Minimal Information Loss Dilated Network for Gland Instance Segmentation in Colon Histology Images∗]([https://github.com/HuCatoFighting/Swin-Une](https://github.com/XiaoyuZHK/CRAG-Dataset_Aug_ToCOCO)) to download the dataset, or you could download them from {[google drive](https://drive.google.com/drive/folders/1Q_6MD3tWxjxfAcZ-6qYgvCALnhFpUKIs?usp=sharing)}.
 
 - After downloading the datasets, you are supposed to put them into './data/crag/', and the file format reference is as follows.
 
