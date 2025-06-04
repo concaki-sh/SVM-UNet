@@ -1,4 +1,4 @@
-# VM-UNet
+# SVM-UNet
 This is the official code repository for "SVM-UNet: Spatial Vision Mamba UNet for Clinically Robust Gland Segmentation"
 
 ## Abstract
