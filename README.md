@@ -82,4 +82,4 @@ python train.py  # Train and test VM-UNet on the GLAS or CRAG dataset.
 
 ## 5. Acknowledgments
 
-- We thank the authors of [VMamba](https://github.com/MzeroMiko/VMamba) \ [Swin-UNet](https://github.com/HuCaoFighting/Swin-Unet)  \ [VM-UNet]([https://github.com/HuCaoFighting/Swin-Unet](https://github.com/JCruan519/VM-UNet/tree/main) or their open-source codes.
+- We thank the authors of [VMamba](https://github.com/MzeroMiko/VMamba) \ [Swin-UNet](https://github.com/HuCaoFighting/Swin-Unet)  \ [VM-UNet](https://github.com/JCruan519/VM-UNet/tree/main) or their open-source codes.
