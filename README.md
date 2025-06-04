@@ -60,9 +60,9 @@ pip install -r requirements.txt
 
 - The weights of the pre-trained VMamba could be downloaded from [Baidu](https://pan.baidu.com/s/1z9oStFlV0c47dmcRzaRgmQ?pwd=4eid). After that, the pre-trained weights should be stored in './pre_trained_weights/'.
   
-## 3. Train the VM-UNet
+## 3. Train the SVM-UNet
 ```bash
-cd VM-UNet
+cd SVM-UNet
 python train.py  # Train and test VM-UNet on the GLAS or CRAG dataset.
 ```
 
