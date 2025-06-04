@@ -54,7 +54,7 @@ pip install -r requirements.txt
     - images
       - .png
     - labels
-      - .
+      - .png
 
 ## 2. Prepare the pre_trained weights
 
