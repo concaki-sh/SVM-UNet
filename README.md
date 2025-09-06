@@ -1,5 +1,5 @@
-# SVM-UNet
-This is the official code repository for "SVM-UNet: Spatial Vision Mamba UNet for Clinically Robust Gland Segmentation"
+# LFEVM-UNet
+LFEVM-UNet: A Local Feature Enhanced Vision Mamba U-Net for Histopathological Gland Segmentation
 
 ## Abstract
 Colorectal cancer is the third most prevalent malignancy worldwide, and the accuracy of pathological diagnosis plays a critical role in determining clinical treatment strategies. Histopathological images, which provide rich cellular and structural information, are recognized as the gold standard for colorectal cancer grading and diagnosis. Gland morphology serves as a key biomarker for malignancy assessment, making precise gland segmentation a fundamental component of computer-aided pathology. However, existing segmentation methods face persistent challenges due to heterogeneous gland shapes, blurred boundaries, significant size variations, and severe adhesion between glands. To address these issues, we proposed SVM-UNet, a novel segmentation framework based on VM-UNet. The model integrates a Hybrid Atrous Convolution (HAC) module to enhance multi-scale contextual modeling, and incorporates an optimized state space modeling unit, CSS2D, to improve edge and detail representation. Extensive experiments on the CRAG and GlaS datasets have demonstrated that the proposed method outperforms mainstream approaches across multiple metrics, particularly in separating adhesive glands and maintaining boundary continuity. Our code is publicly available at here
